@@ -612,35 +612,56 @@ FUNCTION generate_instruction(parsed_line, current_address):
 
 ## Akış Diyagramı
 
-Aşağıdaki metinsel akış diyagramı, assembler'ın uçtan uca işlem adımlarını özetler:
+Aşağıdaki geliştirilmiş akış diyagramı, assembler'ın iki geçişli yapısını, karar noktalarını ve hata yollarını gösterir:
 
+```mermaid
+flowchart TD
+    A([Başla]) --> B[Kaynak dosyayı oku]
+    B --> C{Dosya okuma başarılı mı?}
+    C -->|Hayır| E1[Hata listesine ekle ve işlemi sonlandır]
+    C -->|Evet| D[Başlat: section=.text, current_address=text_address]
+
+    D --> FP1[1. Geçiş: satır satır parse et]
+    FP1 --> FP2{Direktif mi?}
+    FP2 -->|Evet| FP3[.org/.text/.data ile adres veya section güncelle]
+    FP2 -->|Hayır| FP4{Label var mı?}
+    FP4 -->|Evet| FP5[Label -> current_address olarak symbol table'a ekle]
+    FP4 -->|Hayır| FP6[Komut için adresi +4 ilerlet]
+    FP3 --> FP7[Sonraki satıra geç]
+    FP5 --> FP7
+    FP6 --> FP7
+    FP7 --> FP8{1. geçiş tamamlandı mı?}
+    FP8 -->|Hayır| FP1
+    FP8 -->|Evet| SP1[2. Geçiş: satırları tekrar parse et]
+
+    SP1 --> SP2{Direktif mi?}
+    SP2 -->|Evet| SP3[Direktif verisini üret ve output'a yaz]
+    SP2 -->|Hayır| SP4{Komut mu?}
+    SP4 -->|Hayır| SP7[Sonraki satıra geç]
+    SP4 -->|Evet| SP5[Opcode tablosundan komut bilgisini al]
+    SP5 --> SP6[Komut tipine göre encode et R/I/S/B/U/J]
+    SP6 --> SP6A{Label/offset çözümü ve aralık-kural kontrolleri geçti mi?}
+    SP6A -->|Hayır| E2[Encoding hatasını hata listesine ekle]
+    SP6A -->|Evet| SP6B[Makine kodunu output buffer'a yaz]
+    SP3 --> SP7
+    SP6B --> SP7
+    E2 --> SP7
+    SP7 --> SP8{2. geçiş tamamlandı mı?}
+    SP8 -->|Hayır| SP1
+    SP8 -->|Evet| F{Hata var mı?}
+
+    F -->|Evet| G[Hata raporla ve başarısız dön]
+    F -->|Hayır| H[İstenen formatta çıktı üret ELF/HEX/Binary/Verilog]
+    H --> I([Bitiş])
+    E1 --> I
+    G --> I
 ```
-Başla
-  |
-  v
-Kaynak dosyayı oku
-  |
-  v
-1. Geçiş (First Pass):
-  - Satırları parse et
-  - Direktiflere göre adres güncelle
-  - Label'ları Symbol Table'a ekle
-  |
-  v
-2. Geçiş (Second Pass):
-  - Satırları tekrar parse et
-  - Direktif verilerini üret
-  - Komutları makine koduna çevir
-  - Çıktı buffer'ına yaz
-  |
-  v
-Hata var mı?
-  |-- Evet --> Hata raporla ve dur
-  |-- Hayır --> İstenen formatta çıktı üret (ELF/HEX/Binary/Verilog)
-  |
-  v
-Bitiş
-```
+
+Özet adımlar:
+1. **1. Geçiş**: Sembol tablosu ve adresler kesinleştirilir.
+2. **2. Geçiş**: Komutlar encode edilir, direktif verileri üretilir.
+3. **Doğrulama**: Label çözümü, immediate aralığı, hizalama kuralları kontrol edilir.
+4. **Çıktı**: Hata yoksa hedef formata dönüştürülür.
 
 ---
 
