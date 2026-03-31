@@ -2,20 +2,21 @@
 
 ## İçindekiler
 
-1. [Proje Genel Bakış](#proje-genel-bakış)
-2. [Sistem Mimarisi](#sistem-mimarisi)
-3. [Bileşenlerin Detaylı Açıklaması](#bileşenlerin-detaylı-açıklaması)
-4. [Veri Yapıları](#veri-yapıları)
-5. [Algoritma Tasarımı](#algoritma-tasarımı)
-6. [RISC-V Komut Seti Desteği](#risc-v-komut-seti-desteği)
-7. [Kullanım Kılavuzu](#kullanım-kılavuzu)
-8. [Örnekler ve Test Senaryoları](#örnekler-ve-test-senaryoları)
-9. [Algoritma Karmaşıklığı Analizi](#algoritma-karmaşıklığı-analizi)
-10. [Teknik Detaylar](#teknik-detaylar)
-11. [Literatür Taraması](#literatür-araştırması)
+1. [Giriş](#giriş)
+2. [Literatür Araştırması](#literatür-araştırması)
+3. [Assembler Mimarisi](#assembler-mimarisi)
+4. [Kullanılan Veri Yapıları](#kullanılan-veri-yapıları)
+5. [Opcode Table Tasarımı](#opcode-table-tasarımı)
+6. [Symbol Table Tasarımı](#symbol-table-tasarımı)
+7. [Assembler Algoritması](#assembler-algoritması)
+8. [Akış Diyagramı](#akış-diyagramı)
+9. [Test Senaryoları ve Sonuçlar](#örnekler-ve-test-senaryoları)
+10. [Algoritma Karmaşıklığı Analizi](#algoritma-karmaşıklığı-analizi)
+11. [Sonuç ve Değerlendirme](#sonuç)
+12. [Kaynakça](#kaynakça)
 ---
 
-## Proje Genel Bakış
+## Giriş
 
 ### Amaç
 
@@ -37,7 +38,7 @@ Bu proje, PicoRV işlemcisi için RISC-V RV32I komut setinin bir alt kümesini d
 
 ---
 
-## Sistem Mimarisi
+## Assembler Mimarisi
 
 ### Genel Mimari
 
@@ -113,6 +114,28 @@ end:            # Adres: 0x0010
 3. Komutları makine koduna dönüştür
 4. Sembol tablosundan etiket adreslerini kullan
 5. Çıktı dosyasını oluştur
+
+---
+
+## Opcode Table Tasarımı
+
+Bu bölüm, assembler içinde kullanılan opcode/funct3/funct7 veri modelini açıklar. Uygulama detayı `OpcodeTable (opcode_table.py)` başlığında verilmiştir. Tasarım yaklaşımı:
+
+- Komut adına göre O(1) erişim için hash tabanlı sözlük yapı
+- Komut formatını (`R/I/S/B/U/J`) tek alanda saklama
+- Register adlarını (`xN` ve ABI isimleri) ortak bir eşleme tablosunda toplama
+- Kod üretiminde gerekli minimum alanları (opcode, funct3, funct7) tutarak sade veri modeli kurma
+
+---
+
+## Symbol Table Tasarımı
+
+Bu bölüm, etiket adresleme tasarımını açıklar. Uygulama detayı `SymbolTable (symbol_table.py)` başlığında verilmiştir. Tasarım yaklaşımı:
+
+- Etiket -> adres eşleşmesini O(1) sorgu için sözlükte saklama
+- Aynı etiketin tekrar tanımlanmasını hata olarak yakalama
+- İleri referanslar için geçici liste (`forward_refs`) tutma
+- İki geçişli yaklaşım ile etiket çözümlemeyi deterministik hale getirme
 
 ---
 
@@ -440,7 +463,7 @@ warnings = []  # Uyarı mesajları
 
 ---
 
-## Veri Yapıları
+## Kullanılan Veri Yapıları
 
 ### 1. Opcode Table Veri Yapısı
 
@@ -491,7 +514,7 @@ warnings = []  # Uyarı mesajları
 
 ---
 
-## Algoritma Tasarımı
+## Assembler Algoritması
 
 ### İki Geçişli Assembly Algoritması
 
@@ -584,6 +607,40 @@ FUNCTION generate_instruction(parsed_line, current_address):
 
 **Zaman Karmaşıklığı**: O(1) - sabit zaman
 **Uzay Karmaşıklığı**: O(1) - sabit bellek
+
+---
+
+## Akış Diyagramı
+
+Aşağıdaki metinsel akış diyagramı, assembler'ın uçtan uca işlem adımlarını özetler:
+
+```
+Başla
+  |
+  v
+Kaynak dosyayı oku
+  |
+  v
+1. Geçiş (First Pass):
+  - Satırları parse et
+  - Direktiflere göre adres güncelle
+  - Label'ları Symbol Table'a ekle
+  |
+  v
+2. Geçiş (Second Pass):
+  - Satırları tekrar parse et
+  - Direktif verilerini üret
+  - Komutları makine koduna çevir
+  - Çıktı buffer'ına yaz
+  |
+  v
+Hata var mı?
+  |-- Evet --> Hata raporla ve dur
+  |-- Hayır --> İstenen formatta çıktı üret (ELF/HEX/Binary/Verilog)
+  |
+  v
+Bitiş
+```
 
 ---
 
@@ -1194,7 +1251,7 @@ Bu dokümantasyon, RISC-V RV32I assembler projesinin tüm teknik detaylarını k
 **Lisans**: Eğitim amaçlı
 
 
-# Literatür Araştırması
+## Literatür Araştırması
 
 ## Araştırma Kapsamı
 
