@@ -974,7 +974,7 @@ array:  .byte 1, 2, 3, 4, 5
 .org 0x0000
 
 main:
-    lui  x1, 0x10000     # Load upper immediate
+    lui  x1, 0x1         # Load upper immediate (0x00001000)
     lw   x2, 0(x1)       # Load value1
     lw   x3, 4(x1)       # Load value2
     
@@ -982,7 +982,7 @@ main:
     add  x4, x2, x3      # x4 = value1 + value2
     
     # Store result
-    sw   x4, 8(x1)       # Store result
+    sw   x4, 16(x1)      # Store result
     
     ebreak
 ```
@@ -999,11 +999,11 @@ main:
 0x0000100C   0x00000005
 
 # Text segment
-0x00000000   0x000100B7  # lui  x1, 0x10000
+0x00000000   0x000010B7  # lui  x1, 0x1
 0x00000004   0x0000A103  # lw   x2, 0(x1)
 0x00000008   0x0040A183  # lw   x3, 4(x1)
 0x0000000C   0x00310233  # add  x4, x2, x3
-0x00000010   0x0040A423  # sw   x4, 8(x1)
+0x00000010   0x0040A823  # sw   x4, 16(x1)
 0x00000014   0x00100073  # ebreak
 ```
 
@@ -1014,12 +1014,12 @@ main:
 .org 0x0000
 
 main:
-    addi x1, x0, 5       # x1 = 5
-    addi x2, x0, 10      # x2 = 10
+    addi x5, x0, 5       # x5 = 5
+    addi x6, x0, 10      # x6 = 10
     
 loop:
-    addi x1, x1, 1       # x1 = x1 + 1
-    blt  x1, x2, loop    # If x1 < x2, branch to loop
+    addi x5, x5, 1       # x5 = x5 + 1
+    blt  x5, x6, loop    # If x5 < x6, branch to loop
     
     # Jump example
     jal  x1, subroutine  # Jump and link
