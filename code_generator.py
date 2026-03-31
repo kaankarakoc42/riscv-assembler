@@ -188,31 +188,35 @@ class CodeGenerator:
         rs2 = self._get_register_number(operands[1])
         target_op = operands[2]
         
-        if target_op['type'] == 'immediate':
-            offset = target_op['value']
-        elif target_op['type'] == 'label':
+        if target_op['type'] == 'label':
             target_addr = self.symbol_table.get_address(target_op['value'])
             if target_addr is None:
                 raise ValueError(f"Undefined label: {target_op['value']}")
+            # Branch targets are PC-relative (current instruction address base)
             offset = target_addr - current_address
+        elif target_op['type'] == 'immediate':
+            # Numeric branch operands are treated as explicit PC-relative offsets
+            offset = target_op['value']
         else:
             raise ValueError(f"Expected immediate or label, got {target_op['type']}")
         
-        # Check if offset fits in 13-bit signed range
+        # B-type branch immediate represents multiples of 2 bytes.
+        # Enforce alignment and signed 13-bit offset range before encoding.
         if offset < -4096 or offset > 4094 or offset % 2 != 0:
             raise ValueError(f"Branch offset out of range or not aligned: {offset}")
         
         opcode = inst_info['opcode']
         funct3 = inst_info['funct3']
         
-        # B-type format: imm[12|10:5](7) | rs2(5) | rs1(5) | funct3(3) | imm[4:1|11](5) | opcode(7)
-        imm = self._sign_extend(offset, 13)
-        imm_12 = (imm >> 12) & 0x1
-        imm_11 = (imm >> 11) & 0x1
-        imm_10_5 = (imm >> 5) & 0x3F
-        imm_4_1 = (imm >> 1) & 0xF
+        # Encode B-type immediate fields imm[12|10:5|4:1|11].
+        # Drop bit 0 (always zero) and split remaining signed bits.
+        branch_imm = self._sign_extend(offset, 13) >> 1
+        imm_12 = (branch_imm >> 11) & 0x1
+        imm_10_5 = (branch_imm >> 5) & 0x3F
+        imm_4_1 = branch_imm & 0xF
+        imm_11 = (branch_imm >> 10) & 0x1
         
-        instruction = (imm_12 << 31) | (imm_10_5 << 25) | (rs2 << 20) | (rs1 << 15) | (funct3 << 12) | (imm_11 << 11) | (imm_4_1 << 7) | opcode
+        instruction = (imm_12 << 31) | (imm_10_5 << 25) | (rs2 << 20) | (rs1 << 15) | (funct3 << 12) | (imm_4_1 << 8) | (imm_11 << 7) | opcode
         
         return instruction & 0xFFFFFFFF
     

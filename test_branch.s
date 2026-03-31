@@ -4,12 +4,12 @@
 .org 0x0000
 
 main:
-    addi x1, x0, 5       # x1 = 5
-    addi x2, x0, 10      # x2 = 10
+    addi x5, x0, 5       # x5 = 5
+    addi x6, x0, 10      # x6 = 10
     
 loop:
-    addi x1, x1, 1       # x1 = x1 + 1
-    blt  x1, x2, loop    # If x1 < x2, branch to loop
+    addi x5, x5, 1       # x5 = x5 + 1
+    blt  x5, x6, loop    # If x5 < x6, branch to loop
     
     # Jump example
     jal  x1, subroutine  # Jump and link
