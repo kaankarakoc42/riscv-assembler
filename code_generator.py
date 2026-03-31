@@ -234,8 +234,8 @@ class CodeGenerator:
         else:
             raise ValueError(f"Expected immediate or label, got {imm_op['type']}")
         
-        # U-type uses upper 20 bits
-        imm_31_12 = (imm >> 12) & 0xFFFFF
+        # U-type immediate is already the 20-bit field for bits [31:12]
+        imm_31_12 = imm & 0xFFFFF
         
         opcode = inst_info['opcode']
         
