@@ -12,7 +12,7 @@
 8. [Örnekler ve Test Senaryoları](#örnekler-ve-test-senaryoları)
 9. [Algoritma Karmaşıklığı Analizi](#algoritma-karmaşıklığı-analizi)
 10. [Teknik Detaylar](#teknik-detaylar)
-
+11. [Literatür Taraması](#literatür-araştırması)
 ---
 
 ## Proje Genel Bakış
@@ -1192,3 +1192,92 @@ Bu dokümantasyon, RISC-V RV32I assembler projesinin tüm teknik detaylarını k
 **Proje Tarihi**: 2024
 **Versiyon**: 1.0
 **Lisans**: Eğitim amaçlı
+
+
+# Literatür Araştırması
+
+## Araştırma Kapsamı
+
+Bu çalışma kapsamında literatür araştırması; RISC-V ISA standardı, assembler tasarım prensipleri, iki geçişli assembler yaklaşımı, sembol ve opcode tablosu yapıları ile eğitim amaçlı simülatörlerin yürütme davranışları üzerine odaklanmaktadır.
+
+## İncelenen Konular
+
+- RISC-V RV32I komut seti ve encoding kuralları  
+- Assembler mimarisi ve parse/encode süreçleri  
+- Etiket çözümleme ve forward reference yöntemleri  
+- Direktif işleme stratejileri  
+- ELF ve düz metin object çıktı yaklaşımları  
+- Test ve doğrulama pratikleri  
+
+---
+
+# Kaynakça
+
+## RISC-V ISA ve Komut Seti
+
+[1] RISC-V International,  
+*The RISC-V Instruction Set Manual, Volume I: User-Level ISA (RV32I)*.  
+[Erişim]: https://riscv.org/technical/specifications/
+
+[2] Patterson, D. A., & Hennessy, J. L.,  
+*Computer Organization and Design RISC-V Edition*.  
+Morgan Kaufmann, 2017.
+
+---
+
+## Assembler Tasarımı ve Sistem Yazılımları
+
+[3] Beck, L. L.,  
+*System Software: An Introduction to Systems Programming*.  
+Addison-Wesley, 1997.
+
+[4] Aho, A. V., Lam, M. S., Sethi, R., & Ullman, J. D.,  
+*Compilers: Principles, Techniques, and Tools (2nd Edition)*.  
+Pearson, 2006.
+
+[5] Cooper, K. D., & Torczon, L.,  
+*Engineering a Compiler (2nd Edition)*.  
+Morgan Kaufmann, 2011.
+
+---
+
+## Assembler Direktifleri ve Araç Zinciri
+
+[6] GNU Project,  
+*GNU Assembler (GAS) Documentation*.  
+[Erişim]: https://sourceware.org/binutils/docs/as/
+
+[7] GNU Project,  
+*GNU Binutils Documentation*.  
+[Erişim]: https://sourceware.org/binutils/
+
+---
+
+## Object Dosya Formatı ve Bağlayıcılar
+
+[8] Levine, J. R.,  
+*Linkers and Loaders*.  
+Morgan Kaufmann, 1999.
+
+---
+
+## Simülasyon ve Eğitim Araçları
+
+[9] CPUlator,  
+Educational CPU Simulator.  
+[Erişim]: https://cpulator.01xz.net/
+
+[10] RARS,  
+RISC-V Assembler and Simulator.  
+[Erişim]: https://github.com/TheThirdOne/rars
+
+---
+
+## Test ve Doğrulama Yaklaşımları
+
+[11] GNU Toolchain Utilities (*objdump*, *readelf*)  
+Resmi dokümantasyonlar.  
+[Erişim]: https://sourceware.org/binutils/docs/
+
+[12] Açık kaynak RISC-V test ve doğrulama projeleri  
+(çeşitli referans implementasyonlar).
